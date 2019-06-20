@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html, body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .options {
+        background: #eee;
+        width: 40vh;
+        height: 20vh;
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .options__column {
+        margin: auto;
+        min-width: 25%;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="options"></div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+      var loaded = false;
+      var optionsContainer = document.querySelector('.options');
+
+      function init(state) {
+        loaded = true;
+        state.options.forEach(function(option) {
+          let el = document.createElement('div');
+          el.className = 'options__column';
+          el.innerHTML = option.score + '(' + option.users.length + ')';
+          el.dataset.id = option.id;
+          optionsContainer.appendChild(el);
+
+          el.addEventListener("click", function() {
+            socket.emit('vote', {optionId: option.id, token: 'bosse'});
+          }, false);
+        });
+      }
+      
+      socket.on('state', function(state) {
+        if (!loaded) {
+          init(state);
+        }
+      });
+
+      socket.on('updated', function(option) {
+        el = document.querySelector('.options__column[data-id="' + option.id + '"]');
+        el.innerHTML = option.score + '(' + option.users.length + ')';
+      });
+    </script>
+  </body>
+</html>
