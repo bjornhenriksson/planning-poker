@@ -32,8 +32,7 @@
       var socket = io();
       var loaded = false;
       var optionsContainer = document.querySelector('.options');
-      var urlParams = new URLSearchParams(window.location.search);
-      var room = urlParams.get('room');
+      var room = '{{slug}}';
 
       socket.emit('join', room);
 

@@ -1,10 +1,16 @@
 var app = require('express')();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
-var _ = require('lodash')
+var _ = require('lodash');
+var handlebars = require('handlebars');
+var fs = require('fs');
 
-app.get('/', function(req, res) {
-  res.sendFile(__dirname + '/index.html');
+app.get('/room/:slug', function(req, res) {
+  var slug = req.params.slug
+  var source = fs.readFileSync('index.hbs', 'utf8');
+  var template = handlebars.compile(source);
+
+  res.send(template({slug: slug}));
 });
 
 var rooms = [
