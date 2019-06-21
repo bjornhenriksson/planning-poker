@@ -41,12 +41,12 @@
         room.scoreboard.options.forEach(function(option) {
           let el = document.createElement('div');
           el.className = 'options__column';
-          el.innerHTML = option.score + '(' + option.users.length + ')';
+          el.innerHTML = option.score + '(' + option.users + ')';
           el.dataset.id = option.id;
           optionsContainer.appendChild(el);
 
           el.addEventListener("click", function() {
-            socket.emit('vote', {room: {slug: room.slug}, optionId: option.id, token: 'bosse'});
+            socket.emit('vote', {room: {slug: room.slug}, optionId: option.id, token: '{{user.token}}'});
           }, false);
         });
       }
@@ -57,9 +57,11 @@
         }
       });
 
-      socket.on('updated', function(option) {
-        el = document.querySelector('.options__column[data-id="' + option.id + '"]');
-        el.innerHTML = option.score + '(' + option.users.length + ')';
+      socket.on('updated', function(options) {
+        options.forEach(function(option) {
+          el = document.querySelector('.options__column[data-id="' + option.id + '"]');
+          el.innerHTML = option.score + '(' + option.users + ')';
+        });
       });
     </script>
   </body>

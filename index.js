@@ -5,14 +5,6 @@ var _ = require('lodash');
 var handlebars = require('handlebars');
 var fs = require('fs');
 
-app.get('/room/:slug', function(req, res) {
-  var slug = req.params.slug
-  var source = fs.readFileSync('index.hbs', 'utf8');
-  var template = handlebars.compile(source);
-
-  res.send(template({slug: slug}));
-});
-
 var rooms = [
   {
     slug: 'bosses-rum',
@@ -59,7 +51,15 @@ var rooms = [
           users: []
         }
       ]
-    }
+    },
+    users: [
+      {
+        token: 'abc123'
+      },
+      {
+        token: 'deb123'
+      }
+    ]
   },
   {
     slug: 'ainas-rum',
@@ -76,9 +76,34 @@ var rooms = [
           users: []
         }
       ]
-    }
+    },
+    users: [
+      {
+        token: 'mjao123'
+      },
+      {
+        token: 'mjao1337'
+      }
+    ]
   }
 ]
+
+app.get('/room/:slug/:token', function(req, res) {
+  var slug = req.params.slug;
+  var token = req.params.token;
+
+  var room = _.find(rooms, {slug});
+  var user = _.find(room.users, {token});
+
+  if (user) {
+    var source = fs.readFileSync('index.hbs', 'utf8');
+    var template = handlebars.compile(source);
+
+    res.send(template({slug: slug, user: user}));
+  } else {
+    res.send(404);
+  }
+});
 
 io.on('connection', function(socket) {
   console.log("ssomne connected");
@@ -95,11 +120,26 @@ io.on('connection', function(socket) {
     let room = _.find(rooms, {slug: _.get(vote, 'room.slug')});
 
     let option = _.find(room.scoreboard.options, {id: vote.optionId});
-    // let previousVoteOption = _.find(room.scoreboard.options, {users: user});
+    let previousVoteOption = _.find(room.scoreboard.options, function(option) {
+      return _.includes(option.users, user);
+    });
+
+    if (previousVoteOption) {
+      let index = previousVoteOption.users.indexOf(user);
+      if (index > -1) {
+        previousVoteOption.users.splice(index, 1);
+      }
+    }
     
     option.users.push(user);
 
-    io.emit('updated', option);
+    let updates = [option];
+    
+    if (previousVoteOption) {
+      updates.push(previousVoteOption);
+    }
+
+    io.emit('updated', updates);
   });
 });
 
