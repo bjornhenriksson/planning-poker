@@ -32,10 +32,14 @@
       var socket = io();
       var loaded = false;
       var optionsContainer = document.querySelector('.options');
+      var urlParams = new URLSearchParams(window.location.search);
+      var room = urlParams.get('room');
 
-      function init(state) {
+      socket.emit('join', room);
+
+      function init(room) {
         loaded = true;
-        state.options.forEach(function(option) {
+        room.scoreboard.options.forEach(function(option) {
           let el = document.createElement('div');
           el.className = 'options__column';
           el.innerHTML = option.score + '(' + option.users.length + ')';
@@ -43,14 +47,14 @@
           optionsContainer.appendChild(el);
 
           el.addEventListener("click", function() {
-            socket.emit('vote', {optionId: option.id, token: 'bosse'});
+            socket.emit('vote', {room: {slug: room.slug}, optionId: option.id, token: 'bosse'});
           }, false);
         });
       }
       
-      socket.on('state', function(state) {
+      socket.on('roomData', function(room) {
         if (!loaded) {
-          init(state);
+          init(room);
         }
       });
 
