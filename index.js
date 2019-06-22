@@ -88,6 +88,11 @@ var rooms = [
   }
 ]
 
+function renderLayout(yield) {
+  var source = fs.readFileSync('layout.hbs', 'utf8');
+  return handlebars.compile(source)({yield: yield});
+}
+
 app.get('/room/:slug/:token', function(req, res) {
   var slug = req.params.slug;
   var token = req.params.token;
@@ -96,10 +101,12 @@ app.get('/room/:slug/:token', function(req, res) {
   var user = _.find(room.users, {token});
 
   if (user) {
-    var source = fs.readFileSync('index.hbs', 'utf8');
+    var source = fs.readFileSync('show.hbs', 'utf8');
     var template = handlebars.compile(source);
 
-    res.send(template({slug: slug, user: user}));
+    res.send(renderLayout(
+      template({slug: slug, user: user})
+    ));
   } else {
     res.send(404);
   }

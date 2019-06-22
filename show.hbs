@@ -1,0 +1,39 @@
+<div class="options"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io();
+  var loaded = false;
+  var optionsContainer = document.querySelector('.options');
+  var room = '{{slug}}';
+
+  socket.emit('join', room);
+
+  function init(room) {
+    loaded = true;
+    room.scoreboard.options.forEach(function(option) {
+      let el = document.createElement('div');
+      el.className = 'options__column';
+      el.innerHTML = option.score + '(' + option.users + ')';
+      el.dataset.id = option.id;
+      optionsContainer.appendChild(el);
+
+      el.addEventListener("click", function() {
+        socket.emit('vote', {room: {slug: room.slug}, optionId: option.id, token: '{{user.token}}'});
+      }, false);
+    });
+  }
+  
+  socket.on('roomData', function(room) {
+    if (!loaded) {
+      init(room);
+    }
+  });
+
+  socket.on('updated', function(options) {
+    options.forEach(function(option) {
+      el = document.querySelector('.options__column[data-id="' + option.id + '"]');
+      el.innerHTML = option.score + '(' + option.users + ')';
+    });
+  });
+</script>
