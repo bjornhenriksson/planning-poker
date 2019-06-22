@@ -1,26 +1,80 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>Poker Planning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
+      @import url('https://fonts.googleapis.com/css?family=Montserrat:300,400,700&display=swap');
       html, body {
         height: 100%;
       }
       body {
         display: flex;
-        align-items: center;
-        justify-content: center;
+        font-family: 'Montserrat', sans-serif;
+        background: #fff5ec;
+        color: #352121;
+      }
+      form input {
+        border: 0;
+        margin: 0;
+        padding: 0;
+        outline: none;
+        background: none;
+      }
+      form input[type="text"] {
+        font-size: 42px;
+        width: 100%;
+      }
+      form input[type="submit"] {
+        font-size: 34px;
+      }
+      #sharelink {
+        font-size: 24px;
+      }
+      .container {
+        margin: auto;
+      }
+      .poll {
+        display: none;
       }
       .options {
-        background: #eee;
-        width: 40vh;
-        height: 20vh;
-        display: flex;
-        flex-wrap: wrap;
+        border-radius: 3px;
       }
       .options__column {
-        margin: auto;
-        min-width: 25%;
-        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 10px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+      }
+      .option__score {
+        font-weight: bold;
+      }
+      .options__column:not(:last-child) {
+        border-bottom: 1px solid black;
+      }
+      .options__column div:not(.option__background) {
+        position: relative;
+      }
+      .option__background {
+        background: #88b4f2;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transition: transform 0.2s ease;
+        transform: translateX(-100%);
+      }
+      .voters {
+        text-align: right;
+      }
+
+      @media screen and (min-width: 650px) {
+        .container {
+          width: 50%;
+        }
       }
     </style>
   </head>

@@ -1,111 +1,95 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var _ = require('lodash');
 var handlebars = require('handlebars');
 var fs = require('fs');
 
-var rooms = [
-  {
-    slug: 'bosses-rum',
-    scoreboard: {
-      options: [
-        {
-          id: 1,
-          score: 0,
-          users: []
-        },
-        {
-          id: 2,
-          score: 0.5,
-          users: []
-        },
-        {
-          id: 3,
-          score: 1,
-          users: []
-        },
-        {
-          id: 4,
-          score: 2,
-          users: []
-        },
-        {
-          id: 5,
-          score: 3,
-          users: []
-        },
-        {
-          id: 6,
-          score: 5,
-          users: []
-        },
-        {
-          id: 7,
-          score: 8,
-          users: []
-        },
-        {
-          id: 8,
-          score: 13,
-          users: []
-        }
-      ]
+var scoreboard = {
+  options: [
+    {
+      id: 1,
+      score: 0,
+      users: []
     },
-    users: [
-      {
-        token: 'abc123'
-      },
-      {
-        token: 'deb123'
-      }
-    ]
-  },
-  {
-    slug: 'ainas-rum',
-    scoreboard: {
-      options: [
-        {
-          id: 1,
-          score: 0,
-          users: []
-        },
-        {
-          id: 2,
-          score: 0.5,
-          users: []
-        }
-      ]
+    {
+      id: 2,
+      score: 0.5,
+      users: []
     },
-    users: [
-      {
-        token: 'mjao123'
-      },
-      {
-        token: 'mjao1337'
-      }
-    ]
-  }
-]
+    {
+      id: 3,
+      score: 1,
+      users: []
+    },
+    {
+      id: 4,
+      score: 2,
+      users: []
+    },
+    {
+      id: 5,
+      score: 3,
+      users: []
+    },
+    {
+      id: 6,
+      score: 5,
+      users: []
+    },
+    {
+      id: 7,
+      score: 8,
+      users: []
+    },
+    {
+      id: 8,
+      score: 13,
+      users: []
+    }
+  ]
+}
+
+var rooms = []
 
 function renderLayout(yield) {
   var source = fs.readFileSync('layout.hbs', 'utf8');
   return handlebars.compile(source)({yield: yield});
 }
 
-app.get('/room/:slug/:token', function(req, res) {
+app.use(express.urlencoded());
+
+app.get('/', function(req, res) {
+  var source = fs.readFileSync('new.hbs', 'utf8');
+  var template = handlebars.compile(source);
+
+  res.send(renderLayout(
+    template()
+  ));
+});
+
+app.post('/', function(req, res) {
+  var room = _.pick(req.body.task, 'name');
+  room.slug = _.kebabCase(room.name);
+  room.scoreboard = _.cloneDeep(scoreboard);
+
+  rooms.push(room);
+
+  res.redirect('/' + room.slug + '?showLink=true');
+});
+
+app.get('/:slug', function(req, res) {
   var slug = req.params.slug;
-  var token = req.params.token;
-
+  var showLink = _.get(req.query, 'showLink')
   var room = _.find(rooms, {slug});
-  var user = _.find(room.users, {token});
 
-  if (user) {
+  if (room) {
     var source = fs.readFileSync('show.hbs', 'utf8');
     var template = handlebars.compile(source);
 
     res.send(renderLayout(
-      template({slug: slug, user: user})
+      template({room, showLink})
     ));
   } else {
     res.send(404);
@@ -123,10 +107,12 @@ io.on('connection', function(socket) {
   });
 
   socket.on('vote', function(vote) {
-    let user = vote.token;
-    let room = _.find(rooms, {slug: _.get(vote, 'room.slug')});
+    let user = vote.user;
+    let slug = _.get(vote, 'room.slug');
+    let room = _.find(rooms, {slug: slug});
+    let options = room.scoreboard.options;
 
-    let option = _.find(room.scoreboard.options, {id: vote.optionId});
+    let option = _.find(options, {id: vote.optionId});
     let previousVoteOption = _.find(room.scoreboard.options, function(option) {
       return _.includes(option.users, user);
     });
@@ -140,13 +126,11 @@ io.on('connection', function(socket) {
     
     option.users.push(user);
 
-    let updates = [option];
-    
-    if (previousVoteOption) {
-      updates.push(previousVoteOption);
-    }
+    let totalVotes = _.sum(_.map(options, function(option) {
+      return option.users.length;
+    }));
 
-    io.emit('updated', updates);
+    io.to(slug).emit('updated', totalVotes, options);
   });
 });
 
