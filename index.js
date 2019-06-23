@@ -54,14 +54,14 @@ const scoreboard = {
 const polls = []
 
 function renderLayout(yield) {
-  const source = fs.readFileSync('layout.hbs', 'utf8');
+  const source = fs.readFileSync('views/layout.hbs', 'utf8');
   return handlebars.compile(source)({yield: yield});
 }
 
 app.use(express.urlencoded());
 
 app.get('/', function(req, res) {
-  const source = fs.readFileSync('new.hbs', 'utf8');
+  const source = fs.readFileSync('views/new.hbs', 'utf8');
   const template = handlebars.compile(source);
 
   res.send(renderLayout(
@@ -84,7 +84,7 @@ app.get('/:slug', function(req, res) {
   const poll = _.find(polls, {slug});
 
   if (poll) {
-    const source = fs.readFileSync('show.hbs', 'utf8');
+    const source = fs.readFileSync('views/show.hbs', 'utf8');
     const template = handlebars.compile(source);
 
     res.send(renderLayout(
@@ -100,7 +100,7 @@ app.get('/:slug/share', function(req, res) {
   const poll = _.find(polls, {slug});
 
   if (poll) {
-    const source = fs.readFileSync('share.hbs', 'utf8');
+    const source = fs.readFileSync('views/share.hbs', 'utf8');
     const template = handlebars.compile(source);
 
     res.send(renderLayout(
