@@ -1,16 +1,16 @@
-<div class="container">
+<div class="l-container">
   <h3>Share this url with your colleagues:</h3>
-  <form>
-    <input id="sharelink" type="text" value="">
+  <form class="c-share">
+    <input class="c-share__input" type="text" value="">
   </form>
   
   <br>
 
-  <a id="add" href="#">Add your vote</a>
+  <a id="add">Add your vote</a>
 </div>
 
 <script>
-  const linkForm = document.querySelector('#sharelink');
+  const linkForm = document.querySelector('.c-share__input');
   const taskUrl = window.location.href.replace(/\/share/, '')
 
   if (taskUrl) {

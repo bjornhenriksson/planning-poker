@@ -1,71 +1,96 @@
-<div class="container">
-  <form id="name">
-    <input type="text" placeholder="Enter your name">
-    <input type="submit">
-  </form>
+<div class="l-container">
+  <div class="c-name">
+    <form class="c-name__form">
+      <input type="text" class="c-name__input" placeholder="Enter your name">
+      <input type="submit">
+    </form>
 
-  <div class="poll">
-    <h1>{{room.name}}</h1>
+    <a href="#" class="c-name__skip">See results</a>
+  </div>
+
+  <div class="l-poll__container">
+    <h1>{{poll.name}}</h1>
     <h3>Estimate how complex this task is by clicking on an option below.</h3>
 
     <p><i>The higher the number, the more complex the task is to complete.</i></p>
-    <div class="options"></div>
-    <p><i class="totalVotes"></i></p>
+    <div class="l-options__list"></div>
+    <p><i class="l-poll__sum"></i></p>
   </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
   const socket = io();
-  const pollContainer = document.querySelector('.poll');
-  const optionsContainer = document.querySelector('.options');
-  const form = document.querySelector('#name');
+  const pollContainer = document.querySelector('.l-poll__container');
+  const optionsContainer = document.querySelector('.l-options__list');
+  const nameComponent = document.querySelector('.c-name');
   
-  const room = '{{room.slug}}';
+  const poll = '{{poll.slug}}';
   
-  let loaded = false;
-  let user = '';
+  let user = undefined;
+  let showResults = false;
 
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    user = form.querySelector('input[type="text"]').value;
-    form.remove();
-    socket.emit('join', room);
-    pollContainer.style.display = 'block';
-  });
-
-  function init(room) {
-    loaded = true;
-    room.scoreboard.options.forEach(function(option) {
-      const el = document.createElement('div');
-      el.className = 'options__column';
-      el.innerHTML = '<div class="option__background"></div>' + '<div class="option__score">' + option.score + '</div>' + '<div class="voters"></div>'
-      el.dataset.id = option.id;
-      optionsContainer.appendChild(el);
-
-      el.addEventListener("click", function() {
-        socket.emit('vote', {room: {slug: room.slug}, optionId: option.id, user: user});
-      }, false);
-    });
+  function joinPoll(poll) {
+    socket.emit('join', poll);
+    pollContainer.classList.add('l-poll__container--is-visible');
+    nameComponent.remove();
   }
-  
-  socket.on('roomData', function(room) {
-    if (!loaded) {
-      init(room);
-    }
+
+  nameComponent.querySelector('.c-name__skip').addEventListener("click", function(e) {
+    e.preventDefault();
+    joinPoll(poll);
+    showResults = true;
+  }, false);
+
+  nameComponent.querySelector('.c-name__form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    user = nameComponent.querySelector('.c-name__input').value;
+    joinPoll(poll);
   });
 
-  socket.on('updated', function(totalVotes, options) {
-    options.forEach(function(option) {
-      const el = document.querySelector('.options__column[data-id="' + option.id + '"]');
-      const backgroundPosition = 100 - option.users.length / totalVotes * 100;
-      
-      el.querySelector('.option__background').style.transform = 'translateX(-' + backgroundPosition + '%)';
-      el.querySelector('.voters').innerHTML = option.users.join(', ');
+  function optionComponent({el, option, poll}) {
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'c-option';
+      el.innerHTML = '<div class="c-option__background"></div>' + '<div class="c-option__score">' + option.score + '</div>' + '<div class="c-option__voters"></div>'
+      el.dataset.id = option.id;
+
+      if (user) {
+        el.addEventListener("click", function() {
+          socket.emit('vote', {poll: {slug: poll.slug}, optionId: option.id, user: user});
+          showResults = true;
+        }, false);
+
+        el.classList.add('c-option--is-clickable');
+      }
+    }
+
+    if (showResults) {
+      const backgroundPosition = 100 - option.users.length / poll.scoreboard.totalVotes * 100;
+
+      el.querySelector('.c-option__background').style.transform = 'translateX(-' + backgroundPosition + '%)';
+      el.querySelector('.c-option__voters').innerHTML = option.users.join(', ');
+    }
+
+    return el;
+  }
+
+  socket.on('results', function(poll) {
+    const totalVotes = poll.scoreboard.totalVotes;
+
+    poll.scoreboard.options.forEach(function(option) {
+      let el = document.querySelector('.c-option[data-id="' + option.id + '"]');
+
+      if (el) {
+        optionComponent({el, option, poll});
+      } else {
+        el = optionComponent({option, poll});
+        optionsContainer.appendChild(el);
+      }
     });
 
     if (totalVotes > 1) {
-      document.querySelector('.totalVotes').innerHTML = totalVotes + ' votes in total';
+      document.querySelector('.l-poll__sum').innerHTML = totalVotes + ' votes in total';
     }
   });
 </script>

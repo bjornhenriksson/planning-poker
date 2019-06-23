@@ -28,36 +28,41 @@
       form input[type="submit"] {
         font-size: 34px;
       }
+
       #sharelink {
         font-size: 24px;
       }
-      .container {
+      .l-container {
         margin: auto;
       }
-      .poll {
+      .l-poll__container {
         display: none;
       }
-      .options {
-        border-radius: 3px;
+      .l-poll__container.l-poll__container--is-visible {
+        display: initial;
       }
-      .options__column {
+      .c-option {
         display: flex;
         justify-content: space-between;
         padding: 8px 10px;
         position: relative;
         overflow: hidden;
-        cursor: pointer;
+        opacity: 0.6;
       }
-      .option__score {
+      .c-option.c-option--is-clickable {
+        cursor: pointer;
+        opacity: 1;
+      }
+      .c-option__score {
         font-weight: bold;
       }
-      .options__column:not(:last-child) {
+      .c-option:not(:last-child) {
         border-bottom: 1px solid black;
       }
-      .options__column div:not(.option__background) {
+      .c-option div:not(.c-option__background) {
         position: relative;
       }
-      .option__background {
+      .c-option__background {
         background: #88b4f2;
         position: absolute;
         top: 0;
@@ -67,7 +72,7 @@
         transition: transform 0.2s ease;
         transform: translateX(-100%);
       }
-      .voters {
+      .c-option__voters {
         text-align: right;
       }
 
