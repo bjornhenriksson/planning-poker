@@ -10,8 +10,8 @@
 </div>
 
 <script>
-  let linkForm = document.querySelector('#sharelink');
-  let taskUrl = window.location.href.replace(/\/share/, '')
+  const linkForm = document.querySelector('#sharelink');
+  const taskUrl = window.location.href.replace(/\/share/, '')
 
   if (taskUrl) {
     linkForm.value = taskUrl;

@@ -1,12 +1,12 @@
-var express = require('express');
-var app = express();
-var http = require('http').createServer(app);
-var io = require('socket.io')(http);
-var _ = require('lodash');
-var handlebars = require('handlebars');
-var fs = require('fs');
+const express = require('express');
+const app = express();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+const _ = require('lodash');
+const handlebars = require('handlebars');
+const fs = require('fs');
 
-var scoreboard = {
+const scoreboard = {
   options: [
     {
       id: 1,
@@ -51,18 +51,18 @@ var scoreboard = {
   ]
 }
 
-var rooms = []
+const rooms = []
 
 function renderLayout(yield) {
-  var source = fs.readFileSync('layout.hbs', 'utf8');
+  const source = fs.readFileSync('layout.hbs', 'utf8');
   return handlebars.compile(source)({yield: yield});
 }
 
 app.use(express.urlencoded());
 
 app.get('/', function(req, res) {
-  var source = fs.readFileSync('new.hbs', 'utf8');
-  var template = handlebars.compile(source);
+  const source = fs.readFileSync('new.hbs', 'utf8');
+  const template = handlebars.compile(source);
 
   res.send(renderLayout(
     template()
@@ -70,7 +70,7 @@ app.get('/', function(req, res) {
 });
 
 app.post('/', function(req, res) {
-  var room = _.pick(req.body.task, 'name');
+  const room = _.pick(req.body.task, 'name');
   room.slug = _.kebabCase(room.name);
   room.scoreboard = _.cloneDeep(scoreboard);
 
@@ -80,12 +80,12 @@ app.post('/', function(req, res) {
 });
 
 app.get('/:slug', function(req, res) {
-  var slug = req.params.slug;
-  var room = _.find(rooms, {slug});
+  const slug = req.params.slug;
+  const room = _.find(rooms, {slug});
 
   if (room) {
-    var source = fs.readFileSync('show.hbs', 'utf8');
-    var template = handlebars.compile(source);
+    const source = fs.readFileSync('show.hbs', 'utf8');
+    const template = handlebars.compile(source);
 
     res.send(renderLayout(
       template({room})
@@ -96,12 +96,12 @@ app.get('/:slug', function(req, res) {
 });
 
 app.get('/:slug/share', function(req, res) {
-  var slug = req.params.slug;
-  var room = _.find(rooms, {slug});
+  const slug = req.params.slug;
+  const room = _.find(rooms, {slug});
 
   if (room) {
-    var source = fs.readFileSync('share.hbs', 'utf8');
-    var template = handlebars.compile(source);
+    const source = fs.readFileSync('share.hbs', 'utf8');
+    const template = handlebars.compile(source);
 
     res.send(renderLayout(
       template({room})
@@ -122,18 +122,18 @@ io.on('connection', function(socket) {
   });
 
   socket.on('vote', function(vote) {
-    let user = vote.user;
-    let slug = _.get(vote, 'room.slug');
-    let room = _.find(rooms, {slug: slug});
-    let options = room.scoreboard.options;
+    const user = vote.user;
+    const slug = _.get(vote, 'room.slug');
+    const room = _.find(rooms, {slug: slug});
+    const options = room.scoreboard.options;
 
-    let option = _.find(options, {id: vote.optionId});
-    let previousVoteOption = _.find(room.scoreboard.options, function(option) {
+    const option = _.find(options, {id: vote.optionId});
+    const previousVoteOption = _.find(room.scoreboard.options, function(option) {
       return _.includes(option.users, user);
     });
 
     if (previousVoteOption) {
-      let index = previousVoteOption.users.indexOf(user);
+      const index = previousVoteOption.users.indexOf(user);
       if (index > -1) {
         previousVoteOption.users.splice(index, 1);
       }
@@ -141,7 +141,7 @@ io.on('connection', function(socket) {
     
     option.users.push(user);
 
-    let totalVotes = _.sum(_.map(options, function(option) {
+    const totalVotes = _.sum(_.map(options, function(option) {
       return option.users.length;
     }));
 

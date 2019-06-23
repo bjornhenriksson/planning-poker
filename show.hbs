@@ -16,14 +16,16 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-  var socket = io();
-  var loaded = false;
-  var pollContainer = document.querySelector('.poll');
-  var optionsContainer = document.querySelector('.options');
-  var room = '{{room.slug}}';
-  var user = '';
+  const socket = io();
+  const pollContainer = document.querySelector('.poll');
+  const optionsContainer = document.querySelector('.options');
+  const form = document.querySelector('#name');
+  
+  const room = '{{room.slug}}';
+  
+  let loaded = false;
+  let user = '';
 
-  let form = document.querySelector('#name');
   form.addEventListener('submit', function(e) {
     e.preventDefault();
     user = form.querySelector('input[type="text"]').value;
@@ -35,7 +37,7 @@
   function init(room) {
     loaded = true;
     room.scoreboard.options.forEach(function(option) {
-      let el = document.createElement('div');
+      const el = document.createElement('div');
       el.className = 'options__column';
       el.innerHTML = '<div class="option__background"></div>' + '<div class="option__score">' + option.score + '</div>' + '<div class="voters"></div>'
       el.dataset.id = option.id;
@@ -55,8 +57,8 @@
 
   socket.on('updated', function(totalVotes, options) {
     options.forEach(function(option) {
-      let el = document.querySelector('.options__column[data-id="' + option.id + '"]');
-      let backgroundPosition = 100 - option.users.length / totalVotes * 100;
+      const el = document.querySelector('.options__column[data-id="' + option.id + '"]');
+      const backgroundPosition = 100 - option.users.length / totalVotes * 100;
       
       el.querySelector('.option__background').style.transform = 'translateX(-' + backgroundPosition + '%)';
       el.querySelector('.voters').innerHTML = option.users.join(', ');
