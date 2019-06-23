@@ -1,15 +1,19 @@
 <div class="l-container">
+  <h1>{{poll.name}}</h1>
+
   <div class="c-name">
+    <h3>See and vote on poll by entering your name below.</h3>
     <form class="c-name__form">
-      <input type="text" class="c-name__input" placeholder="Enter your name">
+      <input type="text" class="c-name__input" placeholder="Your name">
       <input type="submit">
     </form>
+
+    <br>
 
     <a href="#" class="c-name__skip">See results</a>
   </div>
 
   <div class="l-poll__container">
-    <h1>{{poll.name}}</h1>
     <h3>Estimate how complex this task is by clicking on an option below.</h3>
 
     <p><i>The higher the number, the more complex the task is to complete.</i></p>

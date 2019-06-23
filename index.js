@@ -112,7 +112,7 @@ app.get('/:slug/share', function(req, res) {
 });
 
 io.on('connection', function(socket) {
-  console.log("ssomne connected");
+  console.log("someone connected");
 
   function results(poll) {
     poll.scoreboard.totalVotes = _.sum(_.map(poll.scoreboard.options, function(option) {
