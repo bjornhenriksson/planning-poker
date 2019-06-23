@@ -1,0 +1,23 @@
+<div class="container">
+  <h3>Share this url with your colleagues:</h3>
+  <form>
+    <input id="sharelink" type="text" value="">
+  </form>
+  
+  <br>
+
+  <a id="add" href="#">Add your vote</a>
+</div>
+
+<script>
+  let linkForm = document.querySelector('#sharelink');
+  let taskUrl = window.location.href.replace(/\/share/, '')
+
+  if (taskUrl) {
+    linkForm.value = taskUrl;
+    document.querySelector('#add').setAttribute('href', taskUrl);
+    linkForm.addEventListener('click', function() {
+      linkForm.select();
+    });
+  } 
+</script>

@@ -76,12 +76,11 @@ app.post('/', function(req, res) {
 
   rooms.push(room);
 
-  res.redirect('/' + room.slug + '?showLink=true');
+  res.redirect('/' + room.slug + '/share');
 });
 
 app.get('/:slug', function(req, res) {
   var slug = req.params.slug;
-  var showLink = _.get(req.query, 'showLink')
   var room = _.find(rooms, {slug});
 
   if (room) {
@@ -89,7 +88,23 @@ app.get('/:slug', function(req, res) {
     var template = handlebars.compile(source);
 
     res.send(renderLayout(
-      template({room, showLink})
+      template({room})
+    ));
+  } else {
+    res.send(404);
+  }
+});
+
+app.get('/:slug/share', function(req, res) {
+  var slug = req.params.slug;
+  var room = _.find(rooms, {slug});
+
+  if (room) {
+    var source = fs.readFileSync('share.hbs', 'utf8');
+    var template = handlebars.compile(source);
+
+    res.send(renderLayout(
+      template({room})
     ));
   } else {
     res.send(404);

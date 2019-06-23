@@ -1,37 +1,17 @@
 <div class="container">
-  {{#if showLink}}
-    <h3>Share this url with your colleagues:</h3>
-    <form>
-      <input id="sharelink" type="text" value="">
-    </form>
-    
-    <br>
+  <form id="name">
+    <input type="text" placeholder="Enter your name">
+    <input type="submit">
+  </form>
 
-    <a id="add" href="#">Add your vote</a>
+  <div class="poll">
+    <h1>{{room.name}}</h1>
+    <h3>Estimate how complex this task is by clicking on an option below.</h3>
 
-    <script>
-      let linkForm = document.querySelector('#sharelink');
-      linkForm.value = window.location.href.replace(/\?.+/, '');
-      document.querySelector('#add').setAttribute('href', window.location.href.replace(/\?.+/, ''));
-      linkForm.addEventListener('click', function() {
-        linkForm.select();
-      });
-    </script>
-  {{else}}
-    <form id="name">
-      <input type="text" placeholder="Enter your name">
-      <input type="submit">
-    </form>
-
-    <div class="poll">
-      <h1>{{room.name}}</h1>
-      <h3>Estimate how complex this task is by clicking on an option below.</h3>
-
-      <p><i>The higher the number, the more complex the task is to complete.</i></p>
-      <div class="options"></div>
-      <p><i class="totalVotes"></i></p>
-    </div>
-  {{/if}}
+    <p><i>The higher the number, the more complex the task is to complete.</i></p>
+    <div class="options"></div>
+    <p><i class="totalVotes"></i></p>
+  </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
