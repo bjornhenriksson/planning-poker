@@ -1,10 +1,12 @@
 # Planning Poker 🃏
 
 A simple Planning Poker app built in node using express, socket.io and handlebars. 
+### Real-time updates across multiple clients:
+![alt showcase](https://github.com/bjornhenriksson/planning-poker/raw/master/showcase-x640.gif)
 
 This app is built with node version 12.4.0.
 
-If you have nvm, run `nvm use` to get the correct node version or download Node manually here:  https://nodejs.org/en/
+If you have nvm(https://github.com/nvm-sh/nvm), run `nvm use` to get the correct node version or just download Node manually here:  https://nodejs.org/en/
 
 ### 1. Clone Repo to your local machine
 
