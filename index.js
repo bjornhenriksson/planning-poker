@@ -53,20 +53,23 @@ const scoreboard = {
 
 const polls = []
 
-function renderLayout(yield) {
-  const source = fs.readFileSync('views/layout.hbs', 'utf8');
-  return handlebars.compile(source)({yield: yield});
-}
+app.engine('hbs', function(filePath, options, callback) {
+  fs.readFile(filePath, 'utf8', function(err, source) {
+    if (err) return callback(err);
+    const template = handlebars.compile(source);
 
+    fs.readFile('views/layout.hbs', 'utf8', function(err, layout) {
+      return callback(null, handlebars.compile(layout)({yield: template(options)}));
+    });
+  });
+});
+
+app.set('views', './views');
+app.set('view engine', 'hbs');
 app.use(express.urlencoded());
 
 app.get('/', function(req, res) {
-  const source = fs.readFileSync('views/new.hbs', 'utf8');
-  const template = handlebars.compile(source);
-
-  res.send(renderLayout(
-    template()
-  ));
+  res.render('new');
 });
 
 app.post('/', function(req, res) {
@@ -84,12 +87,7 @@ app.get('/:slug', function(req, res) {
   const poll = _.find(polls, {slug});
 
   if (poll) {
-    const source = fs.readFileSync('views/show.hbs', 'utf8');
-    const template = handlebars.compile(source);
-
-    res.send(renderLayout(
-      template({poll})
-    ));
+    res.render('show', {poll});
   } else {
     res.send(404);
   }
@@ -100,12 +98,7 @@ app.get('/:slug/share', function(req, res) {
   const poll = _.find(polls, {slug});
 
   if (poll) {
-    const source = fs.readFileSync('views/share.hbs', 'utf8');
-    const template = handlebars.compile(source);
-
-    res.send(renderLayout(
-      template({poll})
-    ));
+    res.render('share', {poll});
   } else {
     res.send(404);
   }
