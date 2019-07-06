@@ -56,7 +56,21 @@
     if (!el) {
       el = document.createElement('div');
       el.className = 'c-option';
-      el.innerHTML = '<div class="c-option__background"></div>' + '<div class="c-option__score">' + option.score + '</div>' + '<div class="c-option__voters"></div>'
+
+      let innerEl = document.createElement('div');
+      innerEl.className = 'c-option__background';
+      el.appendChild(innerEl);
+
+      innerEl = document.createElement('div');
+      innerEl.className = 'c-option__score';
+      innerEl.textContent = option.score;
+      el.appendChild(innerEl);
+
+      innerEl = document.createElement('div');
+      innerEl.className = 'c-option__voters';
+      el.appendChild(innerEl);
+
+      
       el.dataset.id = option.id;
 
       if (user) {
@@ -73,7 +87,7 @@
       const backgroundPosition = 100 - option.users.length / poll.scoreboard.totalVotes * 100;
 
       el.querySelector('.c-option__background').style.transform = 'translateX(-' + backgroundPosition + '%)';
-      el.querySelector('.c-option__voters').innerHTML = option.users.join(', ');
+      el.querySelector('.c-option__voters').textContent = option.users.join(', ');
     }
 
     return el;
@@ -94,7 +108,7 @@
     });
 
     if (totalVotes > 1) {
-      document.querySelector('.l-poll__sum').innerHTML = totalVotes + ' votes in total';
+      document.querySelector('.l-poll__sum').textContent = totalVotes + ' votes in total';
     }
   });
 </script>
