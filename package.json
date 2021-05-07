@@ -19,7 +19,7 @@
   "homepage": "https://github.com/bjornhenriksson/planning-poker#readme",
   "dependencies": {
     "express": "^4.17.1",
-    "handlebars": "^4.1.2",
+    "handlebars": "^4.7.7",
     "lodash": "^4.17.11",
     "socket.io": "^2.2.0"
   }
